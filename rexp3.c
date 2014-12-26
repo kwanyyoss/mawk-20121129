@@ -78,7 +78,7 @@ REmatch(char *str,		/* string to test */
     char *ss;
     register RT_STATE *stackp;
     int u_flag, t;
-    char *str_end = s + str_len;
+    char *const str_end = s + str_len;
     RT_POS_ENTRY *sp;
     char *ts;
 
@@ -162,9 +162,6 @@ REmatch(char *str,		/* string to test */
 	    goto refill;
 	}
 	if (!(s = str_str(s, (size_t) (str_end - s), m->s_data.str, (size_t) m->s_len))) {
-	    goto refill;
-	}
-	if (s >= str + strlen(str)) {
 	    goto refill;
 	}
 	push(m, s + 1, sp, ss, U_ON);

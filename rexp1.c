@@ -52,6 +52,53 @@ new_TWO(
     mp->stop->s_type = M_ACCEPT;
 }
 
+/* when is M_SAVE_POS needed? */
+static int subre_accepts_empty2(const MACHINE *subre)
+{
+    STATE *p;
+    MACHINE rec;
+    int step, ret;
+
+    if (subre->stop < subre->start)
+        return -1;
+
+    for (p = subre->start; p <= subre->stop; p += step) {
+        if (p->s_type == M_U || p->s_type == M_START) {
+            step = 1;
+            ret = 3;
+            continue;
+        }
+        if (p->s_type == M_ACCEPT || p->s_type == M_START + END_ON ||
+            p->s_type == M_END || p->s_type == M_SAVE_POS)
+            return 1;
+
+        step = p->s_data.jump;
+        if (p->s_type == M_2JB || p->s_type == M_2JC || p->s_type == M_1J) {
+            if (step > 0) {
+                ret = 2;
+                continue;
+            }
+            return -2;                  /* must be an error */
+        }
+        if (p->s_type != M_2JA)
+            return 0;
+        rec.start = p + 1;
+        rec.stop = p + step - 1;
+        if ((ret = subre_accepts_empty2(&rec)))
+            break;
+        /* else ret = 0; */
+    }
+
+    return ret;
+}
+
+/* when is M_SAVE_POS needed? */
+static inline int subre_accepts_empty(MACHINE *subre)
+{
+    return REtest("", 0, subre->start);
+}
+
+
 /*  build a machine that recognizes any	 */
 MACHINE
 RE_any(void)
@@ -162,8 +209,32 @@ RE_close(MACHINE * mp)
     register STATE *p;
     unsigned sz;
 
+    sz = (unsigned) (mp->stop - mp->start + 1);
+
+    if (!subre_accepts_empty(mp)) {
+	/*
+	 *          2JA end
+	 * loop:
+	 *          m
+	 *          2JB loop
+	 * end:
+	 *          ACCEPT
+	 */
+	p = (STATE *) RE_malloc((sz + 2) * STATESZ);
+	memcpy(p + 1, mp->start, sz * STATESZ);
+	RE_free(mp->start);
+	mp->start = p;
+	mp->stop = p + (sz + 1);
+	p->s_type = M_2JA;
+	p->s_data.jump = (int) (sz + 1);
+	(p += sz)->s_type = M_2JB;
+	p->s_data.jump = -(int) (sz - 1);
+	p->s_data.jump |= !(p->s_data.jump);
+	(p + 1)->s_type = M_ACCEPT;
+	return;
+    }
     /*
-     *                2JA end
+     *          2JA end
      * loop:
      *          SAVE_POS
      *          m
@@ -171,7 +242,6 @@ RE_close(MACHINE * mp)
      * end:
      *          ACCEPT
      */
-    sz = (unsigned) (mp->stop - mp->start + 1);
     p = (STATE *) RE_malloc((sz + 3) * STATESZ);
     memcpy(p + 2, mp->start, sz * STATESZ);
     RE_free(mp->start);
@@ -193,6 +263,26 @@ RE_poscl(MACHINE * mp)
     register STATE *p;
     unsigned sz;
 
+    sz = (unsigned) (mp->stop - mp->start + 1);
+
+    if (!subre_accepts_empty(mp)) {
+	/*
+	 * loop:
+	 *          m
+	 *          2JB loop
+	 * end:
+	 *          ACCEPT
+	 */
+	mp->start = p = (STATE *) RE_realloc(mp->start, (sz + 1) * STATESZ);
+	mp->stop = p + sz;
+	p += --sz;
+	p->s_type = M_2JB;
+	p->s_data.jump = -sz;
+	p->s_data.jump |= !(p->s_data.jump);
+	(p + 1)->s_type = M_ACCEPT;
+	return;
+    }
+
     /*
      * loop:
      *          SAVE_POS
@@ -200,7 +290,6 @@ RE_poscl(MACHINE * mp)
      *          2JC loop
      *          ACCEPT
      */
-    sz = (unsigned) (mp->stop - mp->start + 1);
     p = (STATE *) RE_malloc((sz + 2) * STATESZ);
     memcpy(p + 1, mp->start, sz * STATESZ);
     RE_free(mp->start);

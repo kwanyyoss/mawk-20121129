@@ -214,7 +214,7 @@ REtest(char *str,		/* string to test */
     char *s = str;
     register RT_STATE *stackp;
     int u_flag;
-    char *str_end = str + len;
+    char *const str_end = str + len;
     RT_POS_ENTRY *sp;
     int t;			/*convenient temps */
     STATE *tm;

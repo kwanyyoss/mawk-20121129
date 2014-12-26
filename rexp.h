@@ -204,7 +204,7 @@ extern RT_POS_ENTRY *RE_pos_stack_limit;
 extern RT_POS_ENTRY *RE_pos_stack_empty;
 
 #ifdef LOCAL_REGEXP
-static /* inline */ RT_POS_ENTRY *
+static inline RT_POS_ENTRY *
 RE_pos_push(RT_POS_ENTRY * head, const RT_STATE * owner, const char *s)
 {
     head->pos = s;
@@ -229,7 +229,7 @@ RE_pos_peek(const RT_POS_ENTRY * head)
 }
 #endif
 
-static /* inline */ const char *
+static inline const char *
 RE_pos_pop(RT_POS_ENTRY ** head, const RT_STATE * current)
 {
     RT_POS_ENTRY *prev = *head - (*head)->prev_offset;
