@@ -1,6 +1,49 @@
--- $MawkId: CHANGES,v 1.163 2012/11/29 00:55:33 tom Exp $
+-- $MawkId: CHANGES,v 1.177 2013/12/27 00:53:15 tom Exp $
 
 Changes by Thomas E Dickey <dickey@invisible-island.net>
+
+20131226
+	+ add configure check to work around recent breakage in Cygwin's math.h
+	  which declares _LIB_VERSION without allowing it to be updated (report
+	  by Gert Hulselmans).
+	+ minor updates to configure script, for clang and mingw
+	+ update config.guess and config.sub
+
+20130803
+	+ minor updates to configure script
+	+ add limit-checks, improve index computation in scan.c to fix old
+	  1.3.3 problems with very long string-literals in the parsed script
+	  (report by Marcin Krol).
+	+ update config.guess and config.sub
+
+20130219
+	+ modify missing-operand check in rexp.c to allow the case of empty
+	  "()", matching behavior of gawk and BWK (report by Arkadiusz
+	  Miskiewicz).
+	+ revert in-progress change to gsub retain ifdef'd for additional
+	  development since it did not handle array as the second parameter
+	  (report by Arkadiusz Miskiewicz).
+
+20121209
+	+ build-fix for cygwin in matherr.c, which declares a different type
+	  for _LIB_VERSION 
+	+ add missing "-f" option in examples/gdecl.awk
+	+ fix a regression in fflush, ensuring that it returns an error if
+	  the argument does not match any output filename (report by Nathan
+	  Weeks).
+	+ modify wording of configure --help message to make it clear that
+	  the default for --with-builtin-regex uses the builtin regular
+	  expression engine of mawk.
+	+ fix issues reported by Coverity scan.  Most of these were minor,
+	  and were addressed by modifying the source to allow Coverity to
+	  improve its analysis of the code.
+	+ amend support for LC_NUMERIC by translating period to the local
+	  decimal separator as needed to work with strtod() which is used
+	  to validate decimal constants when scanning source files.  This
+	  fixes an infinite loop with
+		mawk 'BEGIN { print 1.0 }'
+	  (report by Jan Psota).
+	+ regenerate man/mawk.doc, overlooked in previous updates.
 
 20121129
 	+ change behavior if internal fflush call fails: rather than exiting
@@ -30,7 +73,7 @@ Changes by Thomas E Dickey <dickey@invisible-island.net>
 		  --posix
 		  --re-interval
 		  --traditional
-	+ integrate patch by Dominic Letz for strtime function.
+	+ integrate strtime function (patch by Dominic Letz).
 	+ correct logic for "/dev/stdin" special device (GenToo #424137).
 	+ updates for configure script macros:
 	  + modify configure script and makefile to support cross-compiles.

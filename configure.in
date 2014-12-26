@@ -1,8 +1,8 @@
-dnl $MawkId: configure.in,v 1.48 2012/11/03 00:22:45 tom Exp $
+dnl $MawkId: configure.in,v 1.50 2013/12/27 00:45:25 tom Exp $
 dnl configure.in for mawk
 dnl ###########################################################################
 dnl configure.in
-dnl copyright 2008-2010,2012, Thomas E. Dickey
+dnl copyright 2008-2012,2013, Thomas E. Dickey
 dnl copyright 1991-1994,1995, Michael D. Brennan
 dnl
 dnl This is a source file for mawk, an implementation of
@@ -67,7 +67,7 @@ CF_ENABLE_WARNINGS
 ###############################################################################
 AC_MSG_CHECKING(if you want to use mawk's own regular-expressions engine)
 AC_ARG_WITH([builtin-regex],
-[  --with-builtin-regex    use mawk's own regular-expressions engine],
+[  --without-builtin-regex do not use mawk's own regular-expressions engine],
 [
 	with_builtin_regex=$withval
 ])
@@ -132,6 +132,7 @@ CF_LOCALE
 CF_CHECK_ENVIRON(environ)
 
 AC_CHECK_FUNCS(fork matherr mktime pipe strftime tdestroy tsearch wait)
+
 test "$ac_cv_func_fork" = yes && \
 test "$ac_cv_func_pipe" = yes && \
 test "$ac_cv_func_wait" = yes && \
@@ -139,6 +140,8 @@ AC_DEFINE(HAVE_REAL_PIPES,1,[Define to 1 if we have functions needed to setup Un
 
 AC_CHECK_HEADERS(errno.h fcntl.h unistd.h sys/wait.h)
 
+CF_SET_MATH_LIB_VERSION
 CF_MAWK_FIND_MAX_INT
 CF_MAWK_RUN_FPE_TESTS
+
 AC_OUTPUT(Makefile)

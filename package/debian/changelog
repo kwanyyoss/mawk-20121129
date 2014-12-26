@@ -1,3 +1,27 @@
+mawk-cur (1.3.4-20131226) unstable; urgency=low
+
+  * configure-script updates
+
+ -- Thomas E. Dickey <dickey@invisible-island.net>  Thu, 26 Dec 2013 18:04:43 -0500
+
+mawk-cur (1.3.4-20130803) unstable; urgency=low
+
+  * miscelleneous bug-fixes
+
+ -- Thomas E. Dickey <dickey@invisible-island.net>  Sat, 03 Aug 2013 09:29:37 -0400
+
+mawk-cur (1.3.4-20130220) unstable; urgency=low
+
+  * miscelleneous bug-fixes
+
+ -- Thomas E. Dickey <dickey@invisible-island.net>  Tue, 19 Feb 2013 06:45:33 -0500
+
+mawk-cur (1.3.4-20121209) unstable; urgency=low
+
+  * fix regression with LC_NUMERIC feature
+
+ -- Thomas E. Dickey <dickey@invisible-island.net>  Thu, 06 Dec 2012 05:23:52 -0500
+
 mawk-cur (1.3.4-20121129) unstable; urgency=low
 
   * implement length(array)

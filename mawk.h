@@ -1,6 +1,6 @@
 /********************************************
 mawk.h
-copyright 2008-2010,2012 Thomas E. Dickey
+copyright 2008-2012,2013 Thomas E. Dickey
 copyright 1991-1995,1996 Michael D. Brennan
 
 This is a source file for mawk, an implementation of
@@ -11,7 +11,7 @@ the GNU General Public License, version 2, 1991.
 ********************************************/
 
 /*
- * $MawkId: mawk.h,v 1.39 2012/10/30 23:20:47 tom Exp $
+ * $MawkId: mawk.h,v 1.44 2013/08/03 13:04:24 tom Exp $
  * @Log: mawk.h,v @
  * Revision 1.10  1996/08/25 19:31:04  mike
  * Added work-around for solaris strtod overflow bug.
@@ -73,6 +73,13 @@ the GNU General Public License, version 2, 1991.
 #define GCC_UNUSED		/* nothing */
 #endif
 
+#if defined(__GNUC__) && defined(_FORTIFY_SOURCE)
+#define IGNORE_RC(func) ignore_unused = (int) func
+extern int ignore_unused;
+#else
+#define IGNORE_RC(func) (void) func
+#endif /* gcc workarounds */
+
 #ifdef   DEBUG
 #define  YYDEBUG  1
 extern int yydebug;		/* print parse if on */
@@ -128,6 +135,10 @@ extern int brace_cnt;
 extern int print_flag, getline_flag;
 extern short mawk_state;
 #define EXECUTION       1	/* other state is 0 compiling */
+
+#ifdef LOCALE
+extern char decimal_dot;
+#endif
 
 extern char *progname;		/* for error messages */
 extern unsigned rt_nr, rt_fnr;	/* ditto */
@@ -232,9 +243,13 @@ extern void TraceFunc(const char *, CELL *);
 #define TRACE_FUNC(name,cp)	/* nothing */
 #endif
 
+#if OPT_TRACE > 0
+extern const char *da_type_name(CELL *);
+extern const char *da_op_name(INST *);
+#endif
+
 #ifdef NO_LEAKS
 
-extern const char *da_op_name(INST *);
 extern void free_cell_data(CELL *);
 extern void free_codes(const char *, INST *, size_t);
 extern void no_leaks_cell(CELL *);

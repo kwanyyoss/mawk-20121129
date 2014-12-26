@@ -1,6 +1,6 @@
 /********************************************
 zmalloc.c
-copyright 2008-2010,2012, Thomas E. Dickey
+copyright 2008-2012,2013, Thomas E. Dickey
 copyright 1991-1993,1995, Michael D. Brennan
 
 This is a source file for mawk, an implementation of
@@ -11,7 +11,7 @@ the GNU General Public License, version 2, 1991.
 ********************************************/
 
 /*
- * $MawkId: zmalloc.c,v 1.25 2012/11/02 00:39:09 tom Exp $
+ * $MawkId: zmalloc.c,v 1.29 2013/02/19 11:54:10 tom Exp $
  * @Log: zmalloc.c,v @
  * Revision 1.6  1995/06/06  00:18:35  mike
  * change mawk_exit(1) to mawk_exit(2)
@@ -102,7 +102,7 @@ the GNU General Public License, version 2, 1991.
 #endif
 
 #ifdef DEBUG_ZMALLOC
-#define IsPoolable(blocks)  ((blocks) == 0)
+#define IsPoolable(blocks)  0
 #define Malloc(n) calloc(1,n)
 #else
 #define IsPoolable(blocks)  ((blocks) <= POOLSZ)
@@ -231,10 +231,10 @@ out_of_mem(void)
     static char out[] = "out of memory";
 
     if (mawk_state == EXECUTION) {
-	rt_error(out);
+	rt_error("%s", out);
     } else {
 	/* I don't think this will ever happen */
-	compile_error(out);
+	compile_error("%s", out);
 	mawk_exit(2);
     }
 }
@@ -308,8 +308,8 @@ zfree(PTR p, size_t size)
     unsigned blocks = BytesToBlocks(size);
 
     if (!IsPoolable(blocks)) {
-	free(p);
 	FinishPtr(p, size);
+	free(p);
     } else {
 	((ZBLOCK *) p)->link = pool[--blocks];
 	pool[blocks] = (ZBLOCK *) p;

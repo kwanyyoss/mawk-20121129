@@ -1,6 +1,6 @@
 /********************************************
 matherr.c
-copyright 2009-2010,2012 Thomas E. Dickey
+copyright 2009-2012,2013 Thomas E. Dickey
 copyright 1991, Michael D. Brennan
 
 This is a source file for mawk, an implementation of
@@ -11,7 +11,7 @@ the GNU General Public License, version 2, 1991.
 ********************************************/
 
 /*
- * $MawkId: matherr.c,v 1.25 2012/10/27 10:58:31 tom Exp $
+ * $MawkId: matherr.c,v 1.27 2013/12/27 00:45:11 tom Exp $
  *
  * @Log: matherr.c,v @
  * Revision 1.9  1996/09/01 16:54:35  mike
@@ -54,14 +54,6 @@ the GNU General Public License, version 2, 1991.
 #else
 #define FPE_ARGS int sig, int why
 #define FPE_DECL		/* nothing */
-#endif
-
-/* Sets up NetBSD 1.0A for ieee floating point */
-#if defined(_LIB_VERSION_TYPE) && defined(_LIB_VERSION) && defined(_IEEE_)
-#ifdef _CONST
-_CONST				/* needed for cygwin */
-#endif
-_LIB_VERSION_TYPE _LIB_VERSION = _IEEE_;
 #endif
 
 #ifdef	USE_IEEEFP_H
@@ -134,6 +126,9 @@ fpe_catch(FPE_ARGS)
 void
 fpe_init(void)
 {
+#ifdef HAVE_MATH__LIB_VERSION
+    _LIB_VERSION = _IEEE_;
+#endif
     TURN_ON_FPE_TRAPS;
 
 #ifdef HAVE_SIGACTION_SA_SIGACTION
